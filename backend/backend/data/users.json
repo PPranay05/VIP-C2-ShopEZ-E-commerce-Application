@@ -2,7 +2,7 @@
   {
     "name": "ShopEZ Admin",
     "email": "admin@shopez.com",
-    "password": "$2a$10$Z4oyangSVHmMcMQPDULQIeu3mNG/kZBXbHt44wxn03N5rDGs6BC4.",
+    "password": "$2a$10$ay/BSr/.HcOzfB9dTpK2iuOd5GNMqPzBkUPewGHGCUpkCqTDcMmJa",
     "role": "admin",
     "address": {
       "street": "100 Admin HQ Way",
@@ -19,17 +19,17 @@
         "country": "USA"
       }
     ],
-    "_id": "6a2e9cf6659c542a6adcd9f8",
+    "_id": "6a2ef14cd5dfc8dee1112739",
     "isBlocked": false,
     "walletBalance": 40000,
     "wishlist": [],
-    "createdAt": "2026-06-14T12:22:14.553Z",
-    "updatedAt": "2026-06-14T12:22:14.553Z"
+    "createdAt": "2026-06-14T18:22:05.239Z",
+    "updatedAt": "2026-06-14T18:22:05.239Z"
   },
   {
     "name": "John Doe",
     "email": "john@gmail.com",
-    "password": "$2a$10$oK/nh7Gwfbd.mEG5/K3lSuM3I6t8TuncXIU297n4/2IdeBmrN0wxu",
+    "password": "$2a$10$MbJZWhxsYORDYR6JMaTUl.xsJckuWDyZvwrRSBzuDKC4Ht0Aw3kqe",
     "role": "customer",
     "address": {
       "street": "123 Pine St",
@@ -53,11 +53,11 @@
         "country": "USA"
       }
     ],
-    "_id": "6a2e9cf6659c542a6adcd9f9",
+    "_id": "6a2ef14cd5dfc8dee111273a",
     "isBlocked": false,
     "walletBalance": 40000,
     "wishlist": [],
-    "createdAt": "2026-06-14T12:22:14.552Z",
-    "updatedAt": "2026-06-14T12:22:14.552Z"
+    "createdAt": "2026-06-14T18:22:05.239Z",
+    "updatedAt": "2026-06-14T18:22:05.239Z"
   }
 ]

@@ -3,7 +3,7 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 
 // Define output folders
-const rootDir = path.resolve(__dirname, '..', 'MERN Phase Wise');
+const rootDir = path.resolve(__dirname, '..', 'documents');
 const docDir = path.join(rootDir, 'Project Documentation');
 const phaseDir = path.join(rootDir, 'Phase Wise Templets');
 const ideationDir = path.join(phaseDir, 'Brainstorming & Ideation Phase');
@@ -85,30 +85,35 @@ function drawCoverPage(title, subtitle, phase) {
   }
 
   // Metadata block box
-  const metaY = doc.page.height - 180;
-  doc.rect(100, metaY, 400, 100).fill(COLORS.light);
+  const metaY = doc.page.height - 185;
+  doc.rect(100, metaY, 400, 110).fill(COLORS.light);
   
   doc.fillColor(COLORS.dark)
      .font('Helvetica-Bold')
-     .fontSize(10)
-     .text('PROJECT NAME:', 120, metaY + 15)
+     .fontSize(9)
+     .text('PROJECT NAME:', 120, metaY + 12)
      .font('Helvetica')
-     .text('ShopEZ Premium E-Commerce Platform', 220, metaY + 15)
+     .text('ShopEZ Premium E-Commerce Platform', 240, metaY + 12)
      
      .font('Helvetica-Bold')
-     .text('PREPARED BY:', 120, metaY + 35)
+     .text('REPOSITORY NAME:', 120, metaY + 30)
      .font('Helvetica')
-     .text('P Pranay', 220, metaY + 35)
-     
-     .font('Helvetica-Bold')
-     .text('DATE:', 120, metaY + 55)
-     .font('Helvetica')
-     .text('June 2026', 220, metaY + 55)
+     .text('VIP-C2-ShopEZ-E-commerce-Application', 240, metaY + 30)
 
      .font('Helvetica-Bold')
-     .text('VERSION / STATUS:', 120, metaY + 75)
+     .text('PREPARED BY:', 120, metaY + 48)
      .font('Helvetica')
-     .text('v1.0.0 / Final Approved', 220, metaY + 75);
+     .text('P Pranay', 240, metaY + 48)
+     
+     .font('Helvetica-Bold')
+     .text('DATE:', 120, metaY + 66)
+     .font('Helvetica')
+     .text('June 2026', 240, metaY + 66)
+
+     .font('Helvetica-Bold')
+     .text('VERSION / STATUS:', 120, metaY + 84)
+     .font('Helvetica')
+     .text('v1.0.0 / Final Approved', 240, metaY + 84);
 
   doc.addPage();
 }
