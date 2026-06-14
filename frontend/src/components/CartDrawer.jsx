@@ -105,7 +105,7 @@ const CartDrawer = ({ isOpen, onClose, showToast }) => {
                       </div>
 
                       {/* Item Price */}
-                      <span className="cart-item-price">${(item.price * item.qty).toFixed(2)}</span>
+                      <span className="cart-item-price">₹{(item.price * item.qty).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -119,19 +119,19 @@ const CartDrawer = ({ isOpen, onClose, showToast }) => {
             <div className="cart-summary">
               <div className="summary-row">
                 <span>Subtotal</span>
-                <span>${itemsPrice.toFixed(2)}</span>
+                <span>₹{itemsPrice.toFixed(2)}</span>
               </div>
               <div className="summary-row">
                 <span>Shipping</span>
-                <span>{shippingPrice === 0 ? 'FREE' : `$${shippingPrice.toFixed(2)}`}</span>
+                <span>{shippingPrice === 0 ? 'FREE' : `₹${shippingPrice.toFixed(2)}`}</span>
               </div>
               <div className="summary-row">
                 <span>Est. Sales Tax (8%)</span>
-                <span>${taxPrice.toFixed(2)}</span>
+                <span>₹{taxPrice.toFixed(2)}</span>
               </div>
               <div className="summary-row total">
                 <span>Total</span>
-                <span>${totalPrice.toFixed(2)}</span>
+                <span>₹{totalPrice.toFixed(2)}</span>
               </div>
             </div>
 

@@ -13,6 +13,10 @@ const orderSchema = mongoose.Schema(
         qty: { type: Number, required: true },
         image: { type: String, required: true },
         price: { type: Number, required: true },
+        size: { type: String, default: '' },
+        color: { type: String, default: '' },
+        storage: { type: String, default: '' },
+        weight: { type: String, default: '' },
         product: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,
@@ -36,6 +40,14 @@ const orderSchema = mongoose.Schema(
       status: { type: String },
       update_time: { type: String },
       email_address: { type: String },
+    },
+    couponCode: {
+      type: String,
+      default: '',
+    },
+    couponDiscount: {
+      type: Number,
+      default: 0.0,
     },
     itemsPrice: {
       type: Number,
@@ -72,6 +84,12 @@ const orderSchema = mongoose.Schema(
     },
     deliveredAt: {
       type: Date,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'],
+      default: 'Processing',
     },
   },
   {

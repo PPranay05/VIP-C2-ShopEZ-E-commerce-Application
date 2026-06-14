@@ -1,6 +1,11 @@
 import express from 'express';
-import Order from '../models/Order.js';
-import Product from '../models/Product.js';
+import OrderMongoose from '../models/Order.js';
+import ProductMongoose from '../models/Product.js';
+import UserMongoose from '../models/User.js';
+import { getModel } from '../utils/dbHelper.js';
+const Order = getModel('Order', OrderMongoose);
+const Product = getModel('Product', ProductMongoose);
+const User = getModel('User', UserMongoose);
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -18,6 +23,8 @@ router.post('/', protect, async (req, res) => {
     shippingPrice,
     totalPrice,
     paymentResult,
+    couponCode,
+    couponDiscount,
   } = req.body;
 
   if (orderItems && orderItems.length === 0) {
@@ -25,28 +32,73 @@ router.post('/', protect, async (req, res) => {
   }
 
   try {
-    // 1. Verify and update inventory stock
+    // 1. Verify and update inventory stock (including variant stock)
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
       if (product) {
+        // General product stock check
         if (product.stockQuantity < item.qty) {
           return res.status(400).json({
             message: `Sorry, insufficient stock remaining for: ${product.name}. Available: ${product.stockQuantity}`,
           });
+        }
+
+        // Variant stock check
+        if (product.variants && product.variants.length > 0 && (item.size || item.color || item.storage || item.weight)) {
+          const variant = product.variants.find(
+            (v) =>
+              (!item.size || v.size === item.size) &&
+              (!item.color || v.color === item.color) &&
+              (!item.storage || v.storage === item.storage) &&
+              (!item.weight || v.weight === item.weight)
+          );
+
+          if (variant && variant.stockQuantity < item.qty) {
+            return res.status(400).json({
+              message: `Sorry, insufficient stock remaining for selected variant (${item.size || ''} ${item.color || ''}) of ${product.name}. Available: ${variant.stockQuantity}`,
+            });
+          }
         }
       } else {
         return res.status(404).json({ message: `Product reference ${item.product} not found` });
       }
     }
 
+    // 2. Validate and adjust Wallet payment method if selected
+    if (paymentMethod === 'Wallet') {
+      const user = await User.findById(req.user._id);
+      if (user.walletBalance < totalPrice) {
+        return res.status(400).json({
+          message: `Insufficient Wallet balance. Your balance: $${user.walletBalance.toFixed(2)}. Required: $${totalPrice.toFixed(2)}`,
+        });
+      }
+      user.walletBalance -= totalPrice;
+      await user.save();
+    }
+
     // Decrement inventory stock
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
+      
+      // Decrement variant stock
+      if (product.variants && product.variants.length > 0 && (item.size || item.color || item.storage || item.weight)) {
+        const variant = product.variants.find(
+          (v) =>
+            (!item.size || v.size === item.size) &&
+            (!item.color || v.color === item.color) &&
+            (!item.storage || v.storage === item.storage) &&
+            (!item.weight || v.weight === item.weight)
+        );
+        if (variant) {
+          variant.stockQuantity -= item.qty;
+        }
+      }
+
       product.stockQuantity -= item.qty;
       await product.save();
     }
 
-    // 2. Create the order
+    // 3. Create the order
     const order = new Order({
       orderItems,
       user: req.user._id,
@@ -56,14 +108,17 @@ router.post('/', protect, async (req, res) => {
       taxPrice,
       shippingPrice,
       totalPrice,
-      isPaid: true, // Assuming success from checkout simulation
-      paidAt: Date.now(),
+      couponCode: couponCode || '',
+      couponDiscount: couponDiscount || 0.0,
+      isPaid: paymentMethod !== 'Cash on Delivery', // Paid immediately except for COD
+      paidAt: paymentMethod !== 'Cash on Delivery' ? Date.now() : null,
       paymentResult: {
         id: paymentResult?.id || `ch_mock_${Date.now()}`,
-        status: paymentResult?.status || 'succeeded',
+        status: paymentMethod === 'Cash on Delivery' ? 'pending' : 'succeeded',
         update_time: new Date().toISOString(),
         email_address: req.user.email,
       },
+      status: 'Processing',
     });
 
     const createdOrder = await order.save();
@@ -119,7 +174,35 @@ router.get('/', protect, adminOnly, async (req, res) => {
   }
 });
 
-// @desc    Update order status to delivered
+// @desc    Update order status timeline
+// @route   PUT /api/orders/:id/status
+// @access  Private (Admin Only)
+router.put('/:id/status', protect, adminOnly, async (req, res) => {
+  const { status } = req.body;
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.status = status;
+      if (status === 'Delivered') {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+        if (order.paymentMethod === 'Cash on Delivery') {
+          order.isPaid = true;
+          order.paidAt = Date.now();
+        }
+      }
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @desc    Update order status to delivered (legacy)
 // @route   PUT /api/orders/:id/deliver
 // @access  Private (Admin Only)
 router.put('/:id/deliver', protect, adminOnly, async (req, res) => {
@@ -129,6 +212,11 @@ router.put('/:id/deliver', protect, adminOnly, async (req, res) => {
     if (order) {
       order.isDelivered = true;
       order.deliveredAt = Date.now();
+      order.status = 'Delivered';
+      if (order.paymentMethod === 'Cash on Delivery') {
+        order.isPaid = true;
+        order.paidAt = Date.now();
+      }
 
       const updatedOrder = await order.save();
       res.json(updatedOrder);
@@ -141,3 +229,4 @@ router.put('/:id/deliver', protect, adminOnly, async (req, res) => {
 });
 
 export default router;
+

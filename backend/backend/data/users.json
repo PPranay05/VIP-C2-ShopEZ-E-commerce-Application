@@ -1,0 +1,63 @@
+[
+  {
+    "name": "ShopEZ Admin",
+    "email": "admin@shopez.com",
+    "password": "$2a$10$Z4oyangSVHmMcMQPDULQIeu3mNG/kZBXbHt44wxn03N5rDGs6BC4.",
+    "role": "admin",
+    "address": {
+      "street": "100 Admin HQ Way",
+      "city": "Silicon Valley",
+      "postalCode": "94025",
+      "country": "USA"
+    },
+    "addresses": [
+      {
+        "addressType": "Office",
+        "street": "100 Admin HQ Way",
+        "city": "Silicon Valley",
+        "postalCode": "94025",
+        "country": "USA"
+      }
+    ],
+    "_id": "6a2e9cf6659c542a6adcd9f8",
+    "isBlocked": false,
+    "walletBalance": 40000,
+    "wishlist": [],
+    "createdAt": "2026-06-14T12:22:14.553Z",
+    "updatedAt": "2026-06-14T12:22:14.553Z"
+  },
+  {
+    "name": "John Doe",
+    "email": "john@gmail.com",
+    "password": "$2a$10$oK/nh7Gwfbd.mEG5/K3lSuM3I6t8TuncXIU297n4/2IdeBmrN0wxu",
+    "role": "customer",
+    "address": {
+      "street": "123 Pine St",
+      "city": "New York",
+      "postalCode": "10001",
+      "country": "USA"
+    },
+    "addresses": [
+      {
+        "addressType": "Home",
+        "street": "123 Pine St",
+        "city": "New York",
+        "postalCode": "10001",
+        "country": "USA"
+      },
+      {
+        "addressType": "Office",
+        "street": "550 Broadway St",
+        "city": "New York",
+        "postalCode": "10012",
+        "country": "USA"
+      }
+    ],
+    "_id": "6a2e9cf6659c542a6adcd9f9",
+    "isBlocked": false,
+    "walletBalance": 40000,
+    "wishlist": [],
+    "createdAt": "2026-06-14T12:22:14.552Z",
+    "updatedAt": "2026-06-14T12:22:14.552Z"
+  }
+]

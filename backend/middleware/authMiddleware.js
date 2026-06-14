@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import UserMongoose from '../models/User.js';
+import { getModel } from '../utils/dbHelper.js';
+const User = getModel('User', UserMongoose);
 
 // Protect routes - Verify JWT Token
 const protect = async (req, res, next) => {
@@ -17,6 +19,10 @@ const protect = async (req, res, next) => {
 
       // Get user from database (excluding password)
       req.user = await User.findById(decoded.id).select('-password');
+
+      if (req.user && req.user.isBlocked) {
+        return res.status(403).json({ message: 'Access denied. Your account is blocked by administrator.' });
+      }
 
       next();
     } catch (error) {

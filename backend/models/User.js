@@ -23,6 +23,31 @@ const userSchema = mongoose.Schema(
       postalCode: { type: String, default: '' },
       country: { type: String, default: '' },
     },
+    addresses: [
+      {
+        addressType: { type: String, default: 'Home' }, // 'Home', 'Office', etc.
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        postalCode: { type: String, required: true },
+        country: { type: String, required: true },
+      }
+    ],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+      }
+    ],
+    isBlocked: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    walletBalance: {
+      type: Number,
+      required: true,
+      default: 40000.00, // starting balance for simulated wallet
+    },
     role: {
       type: String,
       required: true,

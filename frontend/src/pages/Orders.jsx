@@ -161,7 +161,7 @@ const Orders = ({ showToast }) => {
 
                   {/* Total price */}
                   <td style={{ fontWeight: '700' }}>
-                    ${order.totalPrice.toFixed(2)}
+                    ₹{order.totalPrice.toFixed(2)}
                   </td>
 
                   {/* Payment */}

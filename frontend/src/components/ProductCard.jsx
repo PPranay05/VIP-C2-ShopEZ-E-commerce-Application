@@ -1,13 +1,14 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Star } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ArrowLeftRight } from 'lucide-react';
 import CartContext from '../context/CartContext';
 
 const ProductCard = ({ product, showToast }) => {
-  const { addToCart, toggleWishlist, wishlist } = useContext(CartContext);
+  const { addToCart, toggleWishlist, wishlist, toggleCompare, compareItems } = useContext(CartContext);
 
-  // Check if item is in wishlist
+  // Check if item is in wishlist & comparison
   const isInWishlist = wishlist.some((x) => x._id === product._id);
+  const isInCompare = compareItems.some((x) => x._id === product._id);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -18,7 +19,13 @@ const ProductCard = ({ product, showToast }) => {
       return;
     }
     
-    const result = addToCart(product, 1);
+    // Add default variant if exists
+    let defaultVariant = null;
+    if (product.variants && product.variants.length > 0) {
+      defaultVariant = product.variants[0];
+    }
+
+    const result = addToCart(product, 1, defaultVariant);
     if (result && !result.success) {
       showToast(result.message, 'warning');
     } else {
@@ -30,10 +37,33 @@ const ProductCard = ({ product, showToast }) => {
     e.preventDefault();
     e.stopPropagation();
     const result = toggleWishlist(product);
-    if (result.added) {
-      showToast(`Added "${product.name}" to wishlist!`, 'success');
+    result.then((res) => {
+      if (res.added) {
+        showToast(`Added "${product.name}" to wishlist!`, 'success');
+      } else {
+        showToast(`Removed "${product.name}" from wishlist.`, 'info');
+      }
+    }).catch(() => {
+      // Handle non-promise fallback response
+      const exists = wishlist.some((x) => x._id === product._id);
+      if (!exists) {
+        showToast(`Added "${product.name}" to wishlist!`, 'success');
+      } else {
+        showToast(`Removed "${product.name}" from wishlist.`, 'info');
+      }
+    });
+  };
+
+  const handleCompareClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const result = toggleCompare(product);
+    if (result.error) {
+      showToast(result.error, 'warning');
+    } else if (result.added) {
+      showToast(`Added "${product.name}" to comparison!`, 'success');
     } else {
-      showToast(`Removed "${product.name}" from wishlist.`, 'info');
+      showToast(`Removed "${product.name}" from comparison.`, 'info');
     }
   };
 
@@ -57,7 +87,6 @@ const ProductCard = ({ product, showToast }) => {
 
   return (
     <div className="product-card">
-      {/* SVG Gradient definitions for half stars */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           <linearGradient id="halfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -67,30 +96,72 @@ const ProductCard = ({ product, showToast }) => {
         </defs>
       </svg>
 
-      {/* Wishlist Icon */}
-      <button
-        onClick={handleWishlistClick}
-        className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
-        title={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-      >
-        <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
-      </button>
+      {/* Wishlist & Compare Buttons */}
+      <div className="card-actions-overlay">
+        <button
+          onClick={handleWishlistClick}
+          className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
+          title={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+        >
+          <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
+        </button>
+
+        <button
+          onClick={handleCompareClick}
+          className={`compare-btn ${isInCompare ? 'active' : ''}`}
+          title={isInCompare ? 'Remove from Comparison' : 'Add to Comparison'}
+          style={{
+            position: 'absolute',
+            top: '52px',
+            right: '12px',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--bg-secondary)',
+            color: isInCompare ? 'var(--accent-color)' : 'var(--text-secondary)',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2,
+            transition: 'all var(--transition-fast)'
+          }}
+        >
+          <ArrowLeftRight size={15} />
+        </button>
+      </div>
 
       {/* Product Image Link */}
       <Link to={`/product/${product._id}`}>
         <div className="card-image-wrapper">
           <img src={product.images[0] || '/images/placeholder.jpg'} alt={product.name} />
+          
+          {/* Sale and discount badges */}
+          {product.discountType !== 'none' && (
+            <span className="card-badge sale-badge">-{product.discountValue}{product.discountType === 'percentage' ? '%' : '₹'} OFF</span>
+          )}
+          
+          {product.isBOGO && (
+            <span className="card-badge bogo-badge" style={{ backgroundColor: 'var(--success)' }}>BOGO Offer</span>
+          )}
+
           {product.stockQuantity <= 0 ? (
-            <span className="card-badge" style={{ backgroundColor: 'var(--danger)' }}>Out of stock</span>
-          ) : product.stockQuantity <= 5 ? (
-            <span className="card-badge" style={{ backgroundColor: 'var(--warning)' }}>Only {product.stockQuantity} Left</span>
+            <div className="out-of-stock-overlay flex-center">
+              <span>Out of stock</span>
+            </div>
           ) : null}
         </div>
       </Link>
 
       {/* Details Card */}
       <div className="card-details">
-        <span className="product-cat">{product.category}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+          <span className="product-cat">{product.category}</span>
+          <span className="product-brand-tag" style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '500' }}>
+            {product.brand}
+          </span>
+        </div>
+        
         <Link to={`/product/${product._id}`}>
           <h3 className="product-title" title={product.name}>
             {product.name}
@@ -103,9 +174,37 @@ const ProductCard = ({ product, showToast }) => {
           <span>({product.numReviews})</span>
         </div>
 
+        {/* Stock availability dot indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', marginBottom: '12px' }}>
+          <span 
+            className="stock-indicator-dot" 
+            style={{ 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '50%', 
+              backgroundColor: product.stockQuantity <= 0 ? 'var(--danger)' : product.stockQuantity <= 5 ? 'var(--warning)' : 'var(--success)' 
+            }}
+          ></span>
+          <span style={{ color: 'var(--text-secondary)' }}>
+            {product.stockQuantity <= 0 ? 'Out of Stock' : product.stockQuantity <= 5 ? `Only ${product.stockQuantity} items left` : 'In Stock'}
+          </span>
+        </div>
+
         {/* Card Footer */}
         <div className="card-footer">
-          <span className="product-price">${product.price.toFixed(2)}</span>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {product.discountType !== 'none' ? (
+              <>
+                <span className="product-price">₹{product.price.toFixed(2)}</span>
+                <span className="product-original-price" style={{ textDecoration: 'line-through', fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                  ₹{product.originalPrice.toFixed(2)}
+                </span>
+              </>
+            ) : (
+              <span className="product-price">₹{product.price.toFixed(2)}</span>
+            )}
+          </div>
+
           <button
             onClick={handleAddToCart}
             className="add-cart-btn"

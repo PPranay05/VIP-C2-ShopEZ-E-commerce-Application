@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import couponRoutes from './routes/couponRoutes.js';
 
 dotenv.config();
 
@@ -22,6 +23,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Custom API rate limiting logic
+const rateLimitMap = new Map();
+app.use('/api', (req, res, next) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const now = Date.now();
+  const limitWindow = 60 * 1000; // 1 minute window
+  const maxRequests = 120; // 120 requests per minute
+  
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, []);
+  }
+  
+  const requestTimes = rateLimitMap.get(ip).filter(time => now - time < limitWindow);
+  requestTimes.push(now);
+  rateLimitMap.set(ip, requestTimes);
+  
+  if (requestTimes.length > maxRequests) {
+    return res.status(429).json({ message: 'Too many requests. Please try again in a minute.' });
+  }
+  next();
+});
 
 // Serve static assets from uploads directory
 const __dirname = path.resolve();
@@ -36,6 +59,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/coupons', couponRoutes);
 
 // Base Route
 app.get('/api', (req, res) => {

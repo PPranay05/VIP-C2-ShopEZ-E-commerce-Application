@@ -11,6 +11,8 @@ import Orders from './pages/Orders';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
+import Dashboard from './pages/Dashboard';
+import CompareTray from './components/CompareTray';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
@@ -108,6 +110,10 @@ const App = () => {
                   path="/admin"
                   element={<AdminDashboard showToast={showToast} />}
                 />
+                <Route
+                  path="/dashboard"
+                  element={<Dashboard showToast={showToast} />}
+                />
               </Routes>
             </main>
 
@@ -126,6 +132,9 @@ const App = () => {
               onClose={() => setWishlistOpen(false)}
               showToast={showToast}
             />
+
+            {/* Floating Compare Tray */}
+            <CompareTray showToast={showToast} />
 
             {/* Floating Toasts container */}
             <div className="toast-container">

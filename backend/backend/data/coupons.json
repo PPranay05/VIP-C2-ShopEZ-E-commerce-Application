@@ -1,0 +1,35 @@
+[
+  {
+    "_id": "6a2e9cf6659c542a6adce243",
+    "code": "WELCOME10",
+    "discountType": "percentage",
+    "discountValue": 10,
+    "expiryDate": "2028-12-31T23:59:59.000Z",
+    "minPurchase": 2400,
+    "active": true,
+    "createdAt": "2026-06-14T12:22:14.333Z",
+    "updatedAt": "2026-06-14T12:22:14.333Z"
+  },
+  {
+    "_id": "6a2e9cf6659c542a6adce244",
+    "code": "FESTIVAL20",
+    "discountType": "flat",
+    "discountValue": 1600,
+    "expiryDate": "2028-12-31T23:59:59.000Z",
+    "minPurchase": 9600,
+    "active": true,
+    "createdAt": "2026-06-14T12:22:14.333Z",
+    "updatedAt": "2026-06-14T12:22:14.333Z"
+  },
+  {
+    "_id": "6a2e9cf6659c542a6adce245",
+    "code": "FLASHSALE30",
+    "discountType": "percentage",
+    "discountValue": 30,
+    "expiryDate": "2028-12-31T23:59:59.000Z",
+    "minPurchase": 4000,
+    "active": true,
+    "createdAt": "2026-06-14T12:22:14.334Z",
+    "updatedAt": "2026-06-14T12:22:14.334Z"
+  }
+]

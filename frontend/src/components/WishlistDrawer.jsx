@@ -79,7 +79,7 @@ const WishlistDrawer = ({ isOpen, onClose, showToast }) => {
                   
                   <div className="wishlist-item-details">
                     <h4 className="wishlist-item-title" title={item.name}>{item.name}</h4>
-                    <span className="wishlist-item-price">${item.price.toFixed(2)}</span>
+                    <span className="wishlist-item-price">₹{item.price.toFixed(2)}</span>
                   </div>
 
                   <div className="wishlist-item-actions">
