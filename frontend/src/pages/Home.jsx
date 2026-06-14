@@ -297,8 +297,16 @@ const Home = ({ showToast }) => {
         </div>
         <button 
           onClick={() => {
+            setCategory('All');
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.delete('category');
+            setSearchParams(nextParams);
             setOnlyDiscounted(true);
-            document.getElementById('catalog-grid').scrollIntoView({ behavior: 'smooth' });
+            setPage(1);
+            setTimeout(() => {
+              const el = document.getElementById('catalog-grid');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
           }}
           className="btn-primary" 
           style={{ padding: '8px 20px', fontSize: '13px' }}
@@ -347,9 +355,17 @@ const Home = ({ showToast }) => {
           </div>
           <button 
             onClick={() => {
+              setCategory('All');
+              const nextParams = new URLSearchParams(searchParams);
+              nextParams.delete('category');
+              setSearchParams(nextParams);
               setSortBy('price-asc');
               setOnlyDiscounted(true);
-              document.getElementById('catalog-grid').scrollIntoView({ behavior: 'smooth' });
+              setPage(1);
+              setTimeout(() => {
+                const el = document.getElementById('catalog-grid');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
             }}
             className="btn-secondary" 
             style={{ padding: '6px 14px', fontSize: '12px' }}

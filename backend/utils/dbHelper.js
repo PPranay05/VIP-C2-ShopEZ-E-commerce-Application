@@ -278,6 +278,19 @@ export const getModel = (modelName, MongooseModel) => {
               });
             });
           });
+        } else if (query[key] && typeof query[key] === 'object') {
+          if (query[key].$gte !== undefined) {
+            filtered = filtered.filter(item => item[key] >= query[key].$gte);
+          }
+          if (query[key].$lte !== undefined) {
+            filtered = filtered.filter(item => item[key] <= query[key].$lte);
+          }
+          if (query[key].$ne !== undefined) {
+            filtered = filtered.filter(item => item[key] !== query[key].$ne);
+          }
+          if (query[key].$gt !== undefined) {
+            filtered = filtered.filter(item => item[key] > query[key].$gt);
+          }
         } else if (query[key] !== undefined) {
           filtered = filtered.filter(item => item[key] === query[key]);
         }
